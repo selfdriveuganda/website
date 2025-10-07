@@ -8,6 +8,11 @@ export const Route = createFileRoute("/_all")({
 	beforeLoad: async ({ context: { queryClient } }) => {
 		const settings = await queryClient.ensureQueryData(maintenanceQuery);
 		if (settings?.maintenance?.isEnabled) {
+			if (process.env.NODE_ENV === "development") {
+				console.log("Maintenance mode is enabled. Redirecting to /maintenance");
+				return;
+			}
+
 			throw redirect({ to: "/maintenance" });
 		}
 	},

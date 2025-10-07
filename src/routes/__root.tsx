@@ -6,6 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { seo } from "@/utils/seo";
 import appCss from "../styles.css?url";
 
 type MyRouterContext = {
@@ -23,13 +24,61 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "TanStack Start Starter",
+				httpEquiv: "X-UA-Compatible",
+				content: "IE=edge",
 			},
+			{
+				name: "theme-color",
+				content: "#1a56db",
+			},
+			...seo({
+				title:
+					"Self Drive 4x4 Uganda | Rent Premium 4x4 Vehicles & Safari Cars",
+				description:
+					"Rent premium 4x4 vehicles, SUVs, and safari cars for self-drive adventures across Uganda. Affordable rates, comprehensive insurance, unlimited mileage, and 24/7 support.",
+				keywords: [
+					"car rental Uganda",
+					"self drive Uganda",
+					"4x4 rental",
+					"Uganda safari cars",
+					"rent a car Kampala",
+				],
+			}),
 		],
 		links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
+			},
+			{
+				rel: "icon",
+				type: "image/x-icon",
+				href: "/favicon.ico",
+			},
+			{
+				rel: "apple-touch-icon",
+				sizes: "180x180",
+				href: "/apple-touch-icon.png",
+			},
+			{
+				rel: "icon",
+				type: "image/png",
+				sizes: "32x32",
+				href: "/favicon-32x32.png",
+			},
+			{
+				rel: "icon",
+				type: "image/png",
+				sizes: "16x16",
+				href: "/favicon-16x16.png",
+			},
+			{
+				rel: "manifest",
+				href: "/manifest.json",
+			},
+			{
+				rel: "canonical",
+				href: "https://selfdrive4x4uganda.com",
 			},
 		],
 	}),

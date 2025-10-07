@@ -1,3 +1,19 @@
 # https://www.robotstxt.org/robotstxt.html
+# Allow all crawlers
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /api/
+Disallow: /.tanstack/
+Disallow: /.wrangler/
+
+# Sitemap location
+Sitemap: https://selfdrive4x4uganda.com/sitemap.xml
+
+# Crawl-delay for specific bots (optional)
+User-agent: Googlebot
+Crawl-delay: 0
+
+User-agent: Bingbot
+Crawl-delay: 0
