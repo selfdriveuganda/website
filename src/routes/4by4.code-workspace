@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "../.."
+    },
+    {
+      "path": "../../../4by4-final"
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "emmet.showExpandedAbbreviation": "never"
+  }
+}

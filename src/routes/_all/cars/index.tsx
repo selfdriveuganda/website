@@ -1,0 +1,36 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+import CarGrid from "@/components/allcars/CarGrid";
+import CarsHeader from "@/components/allcars/CarsHeader";
+import CategoryButtons from "@/components/allcars/CategoryButtons";
+import ReadyToBook from "@/components/home/ReadyToBook";
+
+const carSearchSchema = z.object({
+	category: z.string().optional().catch(""),
+});
+
+export const Route = createFileRoute("/_all/cars/")({
+	component: RouteComponent,
+	validateSearch: carSearchSchema,
+	head: () => ({
+		links: [
+			// Preload critical background image for cars page
+			{ rel: "preload", as: "image", href: "/images/bg.png" },
+		],
+	}),
+});
+
+function RouteComponent() {
+	return (
+		<div className="typography">
+			<CarsHeader />
+			<div className="container mx-auto px-4 py-1 sm:px-6 sm:py-10 md:mt-10 md:py-12 md:pt-16">
+				<CategoryButtons />
+				<CarGrid />
+				<div className="pt-16">
+					<ReadyToBook />
+				</div>
+			</div>
+		</div>
+	);
+}
