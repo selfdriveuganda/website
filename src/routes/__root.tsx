@@ -6,6 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { NotFound } from "@/components/common/NotFound";
 import { seo } from "@/utils/seo";
 import appCss from "../styles.css?url";
 
@@ -83,6 +84,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 		],
 	}),
 
+	notFoundComponent: NotFound,
 	shellComponent: RootDocument,
 });
 

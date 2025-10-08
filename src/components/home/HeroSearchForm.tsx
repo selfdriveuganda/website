@@ -1,5 +1,8 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronDownIcon } from "lucide-react";
 import React from "react";
+import { fetchAllLocationsQuery } from "@/hooks/locationHook";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
@@ -15,90 +18,82 @@ import {
 	SelectValue,
 } from "../ui/select";
 
-export const HeroSearchForm = () => (
-	<div className="rounded-sm border bg-secondary/30 p-2">
-		<div className="grid grid-cols-1 gap-2 bg-white p-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-12">
-			<div className="col-span-1 sm:col-span-2 md:col-span-4">
-				<PickUpLocation />
-			</div>
-			<div className="col-span-1 sm:col-span-1 md:col-span-3">
-				<PickupDate />
-			</div>
-			<div className="col-span-1 sm:col-span-1 md:col-span-3">
-				<DropoffDate />
-			</div>
-			<div className="col-span-1 flex items-end sm:col-span-2 md:col-span-2">
-				<Button className="w-full bg-primary py-6 text-white hover:bg-primary/90 lg:py-4">
-					Search
-				</Button>
+export const HeroSearchForm = () => {
+	const navigate = useNavigate();
+	const searchParams = useSearch({ strict: false });
+
+	const handleSearch = () => {
+		navigate({
+			to: "/cars",
+			search: searchParams,
+		});
+	};
+
+	return (
+		<div className="rounded-sm border bg-secondary/30 p-2">
+			<div className="grid grid-cols-1 gap-2 bg-white p-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-12">
+				<div className="col-span-1 sm:col-span-2 md:col-span-4">
+					<PickUpLocation />
+				</div>
+				<div className="col-span-1 sm:col-span-1 md:col-span-3">
+					<PickupDate />
+				</div>
+				<div className="col-span-1 sm:col-span-1 md:col-span-3">
+					<DropoffDate />
+				</div>
+				<div className="col-span-1 flex items-end sm:col-span-2 md:col-span-2">
+					<Button
+						className="w-full bg-primary py-6 text-white hover:bg-primary/90 lg:py-4"
+						onClick={handleSearch}
+					>
+						Search
+					</Button>
+				</div>
 			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 function PickUpLocation() {
+	const navigate = useNavigate();
+	const { data: locations } = useSuspenseQuery(fetchAllLocationsQuery);
+
+	// Group locations by type
+	const groupedLocations = locations.reduce(
+		(acc, location) => {
+			const type = location.locationType || "Other";
+			if (!acc[type]) {
+				acc[type] = [];
+			}
+			acc[type].push(location);
+			return acc;
+		},
+		{} as Record<string, typeof locations>
+	);
+
 	return (
 		<div className="flex flex-col gap-3">
 			<Label className="px-1 text-xs">Pickup Location</Label>
-			<Select>
+			<Select
+				onValueChange={(value) =>
+					navigate({ to: ".", search: (old) => ({ ...old, location: value }) })
+				}
+			>
 				<SelectTrigger className="w-full">
-					<SelectValue placeholder="Select a timezone" />
+					<SelectValue placeholder="Select pickup location" />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectGroup>
-						<SelectLabel>North America</SelectLabel>
-						<SelectItem value="est">Eastern Standard Time (EST)</SelectItem>
-						<SelectItem value="cst">Central Standard Time (CST)</SelectItem>
-						<SelectItem value="mst">Mountain Standard Time (MST)</SelectItem>
-						<SelectItem value="pst">Pacific Standard Time (PST)</SelectItem>
-						<SelectItem value="akst">Alaska Standard Time (AKST)</SelectItem>
-						<SelectItem value="hst">Hawaii Standard Time (HST)</SelectItem>
-					</SelectGroup>
-					<SelectGroup>
-						<SelectLabel>Europe & Africa</SelectLabel>
-						<SelectItem value="gmt">Greenwich Mean Time (GMT)</SelectItem>
-						<SelectItem value="cet">Central European Time (CET)</SelectItem>
-						<SelectItem value="eet">Eastern European Time (EET)</SelectItem>
-						<SelectItem value="west">
-							Western European Summer Time (WEST)
-						</SelectItem>
-						<SelectItem value="cat">Central Africa Time (CAT)</SelectItem>
-						<SelectItem value="eat">East Africa Time (EAT)</SelectItem>
-					</SelectGroup>
-					<SelectGroup>
-						<SelectLabel>Asia</SelectLabel>
-						<SelectItem value="msk">Moscow Time (MSK)</SelectItem>
-						<SelectItem value="ist">India Standard Time (IST)</SelectItem>
-						<SelectItem value="cst_china">China Standard Time (CST)</SelectItem>
-						<SelectItem value="jst">Japan Standard Time (JST)</SelectItem>
-						<SelectItem value="kst">Korea Standard Time (KST)</SelectItem>
-						<SelectItem value="ist_indonesia">
-							Indonesia Central Standard Time (WITA)
-						</SelectItem>
-					</SelectGroup>
-					<SelectGroup>
-						<SelectLabel>Australia & Pacific</SelectLabel>
-						<SelectItem value="awst">
-							Australian Western Standard Time (AWST)
-						</SelectItem>
-						<SelectItem value="acst">
-							Australian Central Standard Time (ACST)
-						</SelectItem>
-						<SelectItem value="aest">
-							Australian Eastern Standard Time (AEST)
-						</SelectItem>
-						<SelectItem value="nzst">
-							New Zealand Standard Time (NZST)
-						</SelectItem>
-						<SelectItem value="fjt">Fiji Time (FJT)</SelectItem>
-					</SelectGroup>
-					<SelectGroup>
-						<SelectLabel>South America</SelectLabel>
-						<SelectItem value="art">Argentina Time (ART)</SelectItem>
-						<SelectItem value="bot">Bolivia Time (BOT)</SelectItem>
-						<SelectItem value="brt">Brasilia Time (BRT)</SelectItem>
-						<SelectItem value="clt">Chile Standard Time (CLT)</SelectItem>
-					</SelectGroup>
+					{Object.entries(groupedLocations).map(([type, locs]) => (
+						<SelectGroup key={type}>
+							<SelectLabel className="capitalize">{type}</SelectLabel>
+							{locs.map((location) => (
+								<SelectItem key={location._id} value={location._id}>
+									{location.name}
+									{location.address?.city && ` - ${location.address.city}`}
+								</SelectItem>
+							))}
+						</SelectGroup>
+					))}
 				</SelectContent>
 			</Select>
 		</div>
@@ -106,8 +101,23 @@ function PickUpLocation() {
 }
 
 export function PickupDate() {
+	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(undefined);
+	const [time, setTime] = React.useState("10:30:00");
+
+	const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newTime = e.target.value;
+		setTime(newTime);
+		navigate({
+			to: ".",
+			search: (old) => ({
+				...old,
+				pickupTime: newTime,
+			}),
+		});
+	};
+
 	return (
 		<div className="flex gap-2">
 			<div className="flex flex-1 flex-col gap-3">
@@ -129,8 +139,17 @@ export function PickupDate() {
 						<Calendar
 							captionLayout="dropdown"
 							mode="single"
-							onSelect={(date) => {
-								setDate(date);
+							onSelect={(selectedDate) => {
+								setDate(selectedDate);
+								if (selectedDate) {
+									navigate({
+										to: ".",
+										search: (old) => ({
+											...old,
+											pickupDate: selectedDate.toISOString(),
+										}),
+									});
+								}
 								setOpen(false);
 							}}
 							selected={date}
@@ -139,15 +158,16 @@ export function PickupDate() {
 				</Popover>
 			</div>
 			<div className="flex flex-col gap-3">
-				<Label className="px-1 text-xs" htmlFor="time-picker">
+				<Label className="px-1 text-xs" htmlFor="pickup-time-picker">
 					Time
 				</Label>
 				<Input
 					className="w-24 appearance-none bg-background sm:w-20 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-					defaultValue="10:30:00"
-					id="time-picker"
+					id="pickup-time-picker"
+					onChange={handleTimeChange}
 					step="1"
 					type="time"
+					value={time}
 				/>
 			</div>
 		</div>
@@ -155,8 +175,23 @@ export function PickupDate() {
 }
 
 export function DropoffDate() {
+	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(undefined);
+	const [time, setTime] = React.useState("10:30:00");
+
+	const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newTime = e.target.value;
+		setTime(newTime);
+		navigate({
+			to: ".",
+			search: (old) => ({
+				...old,
+				dropoffTime: newTime,
+			}),
+		});
+	};
+
 	return (
 		<div className="flex gap-2">
 			<div className="flex flex-1 flex-col gap-3">
@@ -178,8 +213,17 @@ export function DropoffDate() {
 						<Calendar
 							captionLayout="dropdown"
 							mode="single"
-							onSelect={(date) => {
-								setDate(date);
+							onSelect={(selectedDate) => {
+								setDate(selectedDate);
+								if (selectedDate) {
+									navigate({
+										to: ".",
+										search: (old) => ({
+											...old,
+											dropoffDate: selectedDate.toISOString(),
+										}),
+									});
+								}
 								setOpen(false);
 							}}
 							selected={date}
@@ -188,15 +232,16 @@ export function DropoffDate() {
 				</Popover>
 			</div>
 			<div className="flex flex-col gap-3">
-				<Label className="px-1 text-xs" htmlFor="time-picker">
+				<Label className="px-1 text-xs" htmlFor="dropoff-time-picker">
 					Time
 				</Label>
 				<Input
 					className="w-24 appearance-none bg-background sm:w-20 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-					defaultValue="10:30:00"
-					id="time-picker"
+					id="dropoff-time-picker"
+					onChange={handleTimeChange}
 					step="1"
 					type="time"
+					value={time}
 				/>
 			</div>
 		</div>

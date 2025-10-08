@@ -4,12 +4,30 @@ import CommonPageHero from "@/components/common/CommonPageHero";
 import DestinationGrid from "@/components/destinations/DestinationGrid";
 import ReadyToBook from "@/components/home/ReadyToBook";
 import { fetchDestinationsWithPackageCountQuery } from "@/hooks/destinationsHook";
+import { seo } from "@/utils/seo";
 
 export const Route = createFileRoute("/_all/destinations/")({
 	component: RouteComponent,
 	loader: async ({ context: { queryClient } }) => {
 		await queryClient.ensureQueryData(fetchDestinationsWithPackageCountQuery);
 	},
+	head: () => ({
+		meta: [
+			...seo({
+				title: "Uganda Destinations | Self Drive 4x4 Uganda",
+				description:
+					"Discover amazing destinations across Uganda with our 4x4 vehicles and luxury cars. Explore national parks, wildlife safaris, and hidden gems that few rental companies reach.",
+				keywords: [
+					"Uganda destinations",
+					"safari destinations",
+					"Uganda national parks",
+					"4x4 destinations",
+					"Uganda travel spots",
+					"self drive destinations",
+				],
+			}),
+		],
+	}),
 });
 
 function RouteComponent() {

@@ -61,12 +61,24 @@ const SingleGridCar = ({ car }: SingleGridCarProps) => {
 						</p>
 					</div>
 					<div className="mt-5 flex w-full items-center justify-between">
-						<Button className="rounded-full text-xs" disabled size="lg">
+						<Button
+							className="rounded-full bg-secondary text-xs"
+							disabled
+							size="lg"
+						>
 							{seats?.value ?? "Unknown"} Seats
 						</Button>
-						<div className="flex items-center gap-1">
-							<h4>${car.price_per_day}</h4>
-							<Label className="text-muted-foreground text-xs">/day</Label>
+						<div className="flex flex-col items-end">
+							<div className="flex items-center gap-1">
+								<h4>${car.price_per_day}</h4>
+								<Label className="text-muted-foreground text-xs">/day</Label>
+							</div>
+							<div className="flex items-center gap-1">
+								<h6>${car.price_per_day_with_driver}</h6>
+								<Label className="text-muted-foreground text-xs">
+									/day with driver
+								</Label>
+							</div>
 						</div>
 					</div>
 				</CardFooter>

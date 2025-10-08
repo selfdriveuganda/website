@@ -4,12 +4,30 @@ import CommonPageHero from "@/components/common/CommonPageHero";
 import ReadyToBook from "@/components/home/ReadyToBook";
 import GridPackage from "@/components/packages/GridPackage";
 import { fetchAllPackagesQuery } from "@/hooks/packagesHook";
+import { seo } from "@/utils/seo";
 
 export const Route = createFileRoute("/_all/packages/")({
 	component: RouteComponent,
 	loader: async ({ context: { queryClient } }) => {
 		await queryClient.ensureQueryData(fetchAllPackagesQuery);
 	},
+	head: () => ({
+		meta: [
+			...seo({
+				title: "Safari Packages | Self Drive 4x4 Uganda",
+				description:
+					"Explore curated safari packages designed for the best Uganda experiences. Wildlife adventures, cultural tours, and custom safari packages with 4x4 vehicle rentals included.",
+				keywords: [
+					"Uganda safari packages",
+					"safari tours",
+					"wildlife packages",
+					"Uganda tour packages",
+					"4x4 safari packages",
+					"custom safari",
+				],
+			}),
+		],
+	}),
 });
 
 function RouteComponent() {

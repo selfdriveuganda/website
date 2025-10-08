@@ -1,22 +1,36 @@
 import type { SanityDocument } from "@sanity/client";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "../ui/button";
 
 function DestinationGrid({ destination }: { destination: SanityDocument }) {
+	const navigate = useNavigate();
+
 	// Handle both URL object and Sanity image reference
 	const imageUrl =
 		typeof destination.mainImage === "string"
 			? destination.mainImage
 			: destination.mainImage?.url || "";
 
+	const handleNavigateToDestination = (destinationSlug: string) => {
+		navigate({
+			to: "/destinations/$destinationSlug",
+			params: { destinationSlug },
+		});
+	};
+
 	return (
-		<Link
-			className="group relative block h-[350px] w-full max-w-full overflow-hidden rounded-xl sm:h-[400px] sm:max-w-[350px] md:h-[350px]"
-			params={{
-				destinationSlug: destination.slug.current,
+		<div
+			className="group relative block h-[350px] w-full max-w-full cursor-pointer overflow-hidden rounded-xl sm:h-[400px] sm:max-w-[350px] md:h-[350px]"
+			onClick={() => handleNavigateToDestination(destination.slug.current)}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					handleNavigateToDestination(destination.slug.current);
+				}
 			}}
-			to={"/destinations/$destinationSlug"}
+			role="button"
+			tabIndex={0}
 		>
 			{/* Background Image - Layer 1 */}
 			<div
@@ -74,8 +88,7 @@ function DestinationGrid({ destination }: { destination: SanityDocument }) {
 					</div>
 				</div>
 			</div>
-		</Link>
+		</div>
 	);
 }
-
 export default DestinationGrid;

@@ -3,11 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { gsap } from "gsap";
 import { Menu, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import {
-	getLogoUrl,
-	settingsQuery,
-	useSiteSettings,
-} from "@/hooks/siteSettingsHook";
+import { getLogoUrl, settingsQuery } from "@/hooks/siteSettingsHook";
 import { Button } from "../ui/button";
 import { OptimizedImage } from "../ui/OptimizedImage";
 
@@ -25,10 +21,10 @@ const menuItems = [
 		name: "Destinations",
 		to: "/destinations",
 	},
-	{
-		name: "Packages",
-		to: "/packages",
-	},
+	// {
+	// 	name: "Packages",
+	// 	to: "/packages",
+	// },
 	{ name: "Blogs", to: "/blogs" },
 ];
 
@@ -254,6 +250,7 @@ export function NavMenu() {
 											"font-bold text-primary underline decoration-primary decoration-2 underline-offset-4",
 									}}
 									className="relative font-semibold text-black/80 text-sm transition-colors hover:text-primary md:text-base"
+									preload="viewport"
 									to={item.to}
 								>
 									{item.name}

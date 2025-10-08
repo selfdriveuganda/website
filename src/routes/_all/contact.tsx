@@ -6,9 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useContactInfo } from "@/hooks/siteSettingsHook";
+import { seo } from "@/utils/seo";
 
 export const Route = createFileRoute("/_all/contact")({
 	component: RouteComponent,
+	head: () => ({
+		meta: [
+			...seo({
+				title: "Contact Us | Self Drive 4x4 Uganda",
+				description:
+					"Get in touch with Self Drive 4x4 Uganda. Contact us for car rental inquiries, bookings, or any questions about our 4x4 vehicles and safari packages.",
+				keywords: [
+					"contact Uganda car rental",
+					"4x4 rental contact",
+					"Uganda safari contact",
+					"car hire inquiries",
+					"booking contact",
+				],
+			}),
+		],
+	}),
 });
 
 function RouteComponent() {

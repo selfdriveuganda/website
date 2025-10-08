@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as AllRouteImport } from './routes/_all'
 import { Route as AllIndexRouteImport } from './routes/_all/index'
+import { Route as AllTermsAndConditionsRouteImport } from './routes/_all/terms-and-conditions'
 import { Route as AllServicesRouteImport } from './routes/_all/services'
+import { Route as AllPrivacyPolicyRouteImport } from './routes/_all/privacy-policy'
 import { Route as AllContactRouteImport } from './routes/_all/contact'
 import { Route as AllPackagesIndexRouteImport } from './routes/_all/packages/index'
 import { Route as AllDestinationsIndexRouteImport } from './routes/_all/destinations/index'
@@ -37,9 +39,19 @@ const AllIndexRoute = AllIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AllRoute,
 } as any)
+const AllTermsAndConditionsRoute = AllTermsAndConditionsRouteImport.update({
+  id: '/terms-and-conditions',
+  path: '/terms-and-conditions',
+  getParentRoute: () => AllRoute,
+} as any)
 const AllServicesRoute = AllServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => AllRoute,
+} as any)
+const AllPrivacyPolicyRoute = AllPrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => AllRoute,
 } as any)
 const AllContactRoute = AllContactRouteImport.update({
@@ -92,7 +104,9 @@ const AllDestinationsDestinationSlugIndexRoute =
 export interface FileRoutesByFullPath {
   '/maintenance': typeof MaintenanceRoute
   '/contact': typeof AllContactRoute
+  '/privacy-policy': typeof AllPrivacyPolicyRoute
   '/services': typeof AllServicesRoute
+  '/terms-and-conditions': typeof AllTermsAndConditionsRoute
   '/': typeof AllIndexRoute
   '/blogs/$blogSlug': typeof AllBlogsBlogSlugRoute
   '/cars/$carSlug': typeof AllCarsCarSlugRoute
@@ -106,7 +120,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/maintenance': typeof MaintenanceRoute
   '/contact': typeof AllContactRoute
+  '/privacy-policy': typeof AllPrivacyPolicyRoute
   '/services': typeof AllServicesRoute
+  '/terms-and-conditions': typeof AllTermsAndConditionsRoute
   '/': typeof AllIndexRoute
   '/blogs/$blogSlug': typeof AllBlogsBlogSlugRoute
   '/cars/$carSlug': typeof AllCarsCarSlugRoute
@@ -122,7 +138,9 @@ export interface FileRoutesById {
   '/_all': typeof AllRouteWithChildren
   '/maintenance': typeof MaintenanceRoute
   '/_all/contact': typeof AllContactRoute
+  '/_all/privacy-policy': typeof AllPrivacyPolicyRoute
   '/_all/services': typeof AllServicesRoute
+  '/_all/terms-and-conditions': typeof AllTermsAndConditionsRoute
   '/_all/': typeof AllIndexRoute
   '/_all/blogs/$blogSlug': typeof AllBlogsBlogSlugRoute
   '/_all/cars/$carSlug': typeof AllCarsCarSlugRoute
@@ -138,7 +156,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/maintenance'
     | '/contact'
+    | '/privacy-policy'
     | '/services'
+    | '/terms-and-conditions'
     | '/'
     | '/blogs/$blogSlug'
     | '/cars/$carSlug'
@@ -152,7 +172,9 @@ export interface FileRouteTypes {
   to:
     | '/maintenance'
     | '/contact'
+    | '/privacy-policy'
     | '/services'
+    | '/terms-and-conditions'
     | '/'
     | '/blogs/$blogSlug'
     | '/cars/$carSlug'
@@ -167,7 +189,9 @@ export interface FileRouteTypes {
     | '/_all'
     | '/maintenance'
     | '/_all/contact'
+    | '/_all/privacy-policy'
     | '/_all/services'
+    | '/_all/terms-and-conditions'
     | '/_all/'
     | '/_all/blogs/$blogSlug'
     | '/_all/cars/$carSlug'
@@ -207,11 +231,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AllIndexRouteImport
       parentRoute: typeof AllRoute
     }
+    '/_all/terms-and-conditions': {
+      id: '/_all/terms-and-conditions'
+      path: '/terms-and-conditions'
+      fullPath: '/terms-and-conditions'
+      preLoaderRoute: typeof AllTermsAndConditionsRouteImport
+      parentRoute: typeof AllRoute
+    }
     '/_all/services': {
       id: '/_all/services'
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof AllServicesRouteImport
+      parentRoute: typeof AllRoute
+    }
+    '/_all/privacy-policy': {
+      id: '/_all/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof AllPrivacyPolicyRouteImport
       parentRoute: typeof AllRoute
     }
     '/_all/contact': {
@@ -282,7 +320,9 @@ declare module '@tanstack/react-router' {
 
 interface AllRouteChildren {
   AllContactRoute: typeof AllContactRoute
+  AllPrivacyPolicyRoute: typeof AllPrivacyPolicyRoute
   AllServicesRoute: typeof AllServicesRoute
+  AllTermsAndConditionsRoute: typeof AllTermsAndConditionsRoute
   AllIndexRoute: typeof AllIndexRoute
   AllBlogsBlogSlugRoute: typeof AllBlogsBlogSlugRoute
   AllCarsCarSlugRoute: typeof AllCarsCarSlugRoute
@@ -296,7 +336,9 @@ interface AllRouteChildren {
 
 const AllRouteChildren: AllRouteChildren = {
   AllContactRoute: AllContactRoute,
+  AllPrivacyPolicyRoute: AllPrivacyPolicyRoute,
   AllServicesRoute: AllServicesRoute,
+  AllTermsAndConditionsRoute: AllTermsAndConditionsRoute,
   AllIndexRoute: AllIndexRoute,
   AllBlogsBlogSlugRoute: AllBlogsBlogSlugRoute,
   AllCarsCarSlugRoute: AllCarsCarSlugRoute,

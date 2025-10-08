@@ -2,18 +2,20 @@ import type { SanityDocument } from "@sanity/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { gsap } from "gsap";
-import { Circle } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	fetchCarCategoriesQuery,
 	fetchCarsByCategoryQuery,
 } from "@/hooks/carsHook";
+import SingleGridCar from "../allcars/SingleGridCar";
 import { Button } from "../ui/button";
 
 const ExploreVehicles = () => {
 	const { data: categories } = useSuspenseQuery(fetchCarCategoriesQuery);
 
-	const [activeCategory, setActiveCategory] = useState<any>(null); // Start with null to show all cars
+	const [activeCategory, setActiveCategory] = useState<SanityDocument | null>(
+		null
+	); // Start with null to show all cars
 	const titleRef = useRef<HTMLHeadingElement>(null);
 	const buttonsRef = useRef<HTMLDivElement>(null);
 	const cardsRef = useRef<HTMLDivElement>(null);
@@ -62,11 +64,6 @@ const ExploreVehicles = () => {
 		);
 	}, []);
 
-	// If no data, return early with a message (after all hooks)
-	if (!categories || categories.length === 0) {
-		return <div className="p-8 text-center">Loading categories...</div>;
-	}
-
 	// Animation when category changes
 	useEffect(() => {
 		if (cardsRef.current) {
@@ -85,7 +82,12 @@ const ExploreVehicles = () => {
 		}
 	}, []);
 
-	const handleCategoryChange = (category: any) => {
+	// If no data, return early with a message (after all hooks)
+	if (!categories || categories.length === 0) {
+		return <div className="p-8 text-center">Loading categories...</div>;
+	}
+
+	const handleCategoryChange = (category: SanityDocument | null) => {
 		// Handle null case (All Cars) and category comparison
 		if (
 			(category === null && activeCategory === null) ||
@@ -180,100 +182,8 @@ const ExploreVehicles = () => {
 				className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-6 md:mt-12 md:grid-cols-3 md:gap-8"
 				ref={cardsRef}
 			>
-				{displayCars.map((car: any, _index: number) => (
-					<Link
-						className="group relative mx-auto h-[200px] w-full cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-lg"
-						key={car._id}
-						onClick={(_e) => {
-							// Handle touch events directly through onClick
-							// This ensures the Link still works on touch devices
-						}}
-						onMouseEnter={(e) => {
-							// Skip hover animations on mobile, but allow tap/touch functionality
-							if (window.innerWidth < 640) {
-								// Do nothing for hover events on mobile
-								return;
-							}
-
-							const img = e.currentTarget.querySelector("img");
-							const nameDetailsContainer = e.currentTarget.querySelector(
-								".name-details-container"
-							);
-							const price = e.currentTarget.querySelector(".price-element");
-
-							gsap.to(img, { scale: 1.1, duration: 0.4, ease: "power2.out" });
-							gsap.to(nameDetailsContainer, {
-								y: -20,
-								duration: 0.3,
-								ease: "power2.out",
-							});
-							gsap.to(price, {
-								opacity: 1,
-								y: 0,
-								duration: 0.3,
-								ease: "power2.out",
-								delay: 0.1,
-							});
-						}}
-						onMouseLeave={(e) => {
-							// Skip hover animations on mobile, but allow tap/touch functionality
-							if (window.innerWidth < 640) {
-								// Do nothing for hover events on mobile
-								return;
-							}
-
-							const img = e.currentTarget.querySelector("img");
-							const nameDetailsContainer = e.currentTarget.querySelector(
-								".name-details-container"
-							);
-							const price = e.currentTarget.querySelector(".price-element");
-
-							gsap.to(img, { scale: 1, duration: 0.4, ease: "power2.out" });
-							gsap.to(nameDetailsContainer, {
-								y: 0,
-								duration: 0.3,
-								ease: "power2.out",
-							});
-							gsap.to(price, {
-								opacity: 0,
-								y: 15,
-								duration: 0.2,
-								ease: "power2.in",
-							});
-						}}
-						params={{ carSlug: car.slug }}
-						to={"/cars/$carSlug"}
-					>
-						<img
-							alt={car.images?.[0]?.alt || car.name}
-							className="h-full w-full object-cover"
-							src={car.images?.[0]?.url || "/placeholder-car.jpg"}
-						/>
-						<div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 to-transparent px-3 text-white sm:px-4">
-							{/* Name and details container that moves up on hover */}
-							<div className="name-details-container">
-								<h3 className="mb-0.5 font-bold text-base sm:mb-1 sm:text-lg">
-									{car.name}
-								</h3>
-								<div className="flex flex-wrap items-center space-x-2 text-xs">
-									{car.specifications
-										?.slice(0, 1)
-										.map((spec: any, i: number) => (
-											<React.Fragment key={i}>
-												<span>{spec.value}</span>
-												{i < Math.min(car.specifications.length, 3) - 1 && (
-													<Circle className="fill-current" size={4} />
-												)}
-											</React.Fragment>
-										))}
-								</div>
-							</div>
-							{/* Price visible on mobile by default, hidden on larger screens until hover */}
-							<p className="price-element translate-y-0 pb-3 font-semibold text-xs opacity-100 sm:translate-y-3 sm:pb-4 sm:text-sm sm:opacity-0">
-								${car.price_per_day}/day
-							</p>
-						</div>
-					</Link>
+				{displayCars.map((car: SanityDocument) => (
+					<SingleGridCar car={car} key={car._id} />
 				))}
 			</div>
 			<div

@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_all")({
 
 function RouteComponent() {
 	return (
-		<div>
+		<div className="typography">
 			<NavMenu />
 			<Outlet />
 			<Footer />

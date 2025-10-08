@@ -49,16 +49,16 @@ function CommonPageHero({ title, description }: CommonPageHeroProps) {
 			{/* Desktop Layout - Text above image */}
 			<div className="hidden h-full flex-col md:flex">
 				{/* Hero Text Section - Desktop */}
-				<div className="flex-shrink-0 pt-16">
-					<div className="mx-auto flex max-w-4xl flex-col items-center">
+				<div className="flex-shrink-0 bg-gray-50 py-12 md:py-16">
+					<div className="container mx-auto flex max-w-4xl flex-col items-center px-4 sm:px-6 lg:px-8">
 						<h2
-							className="text-center font-bold text-3xl text-gray-900 capitalize leading-tight sm:text-3xl sm:leading-tight md:text-4xl md:leading-tight lg:text-5xl xl:text-6xl"
+							className="font-bold text-3xl text-gray-900 capitalize leading-tight sm:text-3xl sm:leading-tight md:text-4xl md:leading-tight lg:text-5xl xl:text-6xl"
 							ref={desktopTitleRef}
 						>
 							{title}
 						</h2>
 						<p
-							className="mx-auto mt-2 max-w-2xl text-center text-gray-600 text-sm sm:mt-3 sm:text-sm md:mt-4 md:text-sm"
+							className="mx-auto mt-2 max-w-2xl text-center text-gray-600 text-sm sm:mt-3 sm:text-sm md:mt-4 md:text-base"
 							ref={desktopDescRef}
 						>
 							{description}
@@ -67,25 +67,22 @@ function CommonPageHero({ title, description }: CommonPageHeroProps) {
 				</div>
 			</div>
 
+			{/* Mobile Layout */}
 			<div className="relative flex h-full flex-col md:hidden">
-				<div className="relative h-full overflow-hidden">
-					<div className="absolute inset-0 z-10 flex items-end bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-						<div className="w-full p-4 pb-8">
-							<div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-								<h2
-									className="mb-3 font-bold text-2xl text-white leading-tight sm:text-3xl"
-									ref={mobileTitleRef}
-								>
-									{title}
-								</h2>
-								<p
-									className="mx-auto max-w-md text-gray-300 text-sm"
-									ref={mobileDescRef}
-								>
-									{description}
-								</p>
-							</div>
-						</div>
+				<div className="relative min-h-[30vh] overflow-hidden bg-gray-50 py-12">
+					<div className="container mx-auto flex flex-col items-center px-4 text-center sm:px-6">
+						<h2
+							className="mb-3 font-bold text-2xl text-gray-900 capitalize leading-tight sm:text-3xl"
+							ref={mobileTitleRef}
+						>
+							{title}
+						</h2>
+						<p
+							className="mx-auto max-w-md text-gray-600 text-sm"
+							ref={mobileDescRef}
+						>
+							{description}
+						</p>
 					</div>
 				</div>
 			</div>

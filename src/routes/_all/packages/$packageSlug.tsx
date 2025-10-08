@@ -4,13 +4,39 @@ import ReadyToBook from "@/components/home/ReadyToBook";
 import PackageSlide from "@/components/packages/PackageSlide";
 import PackageSpecifications from "@/components/packages/PackageSpecifications";
 import { fetchSinglePackageQuery } from "@/hooks/packagesHook";
+import { seo } from "@/utils/seo";
 
 export const Route = createFileRoute("/_all/packages/$packageSlug")({
 	component: RouteComponent,
 	loader: async ({ context: { queryClient }, params }) => {
-		await queryClient.ensureQueryData(
+		const packageData = await queryClient.ensureQueryData(
 			fetchSinglePackageQuery(params.packageSlug)
 		);
+		return { packageData };
+	},
+	head: ({ loaderData }) => {
+		const pkg = loaderData?.packageData;
+		return {
+			meta: [
+				...seo({
+					title: pkg?.title
+						? `${pkg.title} | Safari Packages`
+						: "Safari Package | Self Drive 4x4 Uganda",
+					description:
+						pkg?.description ||
+						"Discover our curated safari package designed for unforgettable Uganda experiences.",
+					keywords: [
+						pkg?.title || "",
+						"Uganda safari",
+						"safari package",
+						"tour package",
+						"4x4 safari",
+					].filter(Boolean),
+					image: pkg?.images?.[0]?.url,
+					type: "product",
+				}),
+			],
+		};
 	},
 });
 

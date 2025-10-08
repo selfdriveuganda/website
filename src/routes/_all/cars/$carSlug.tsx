@@ -10,6 +10,7 @@ import VehicleMainSpecs from "@/components/allcars/VehicleMainSpecs";
 import LoadingComponent from "@/components/common/LoadingComponent";
 import ReadyToBook from "@/components/home/ReadyToBook";
 import { fetchSingleCarQuery } from "@/hooks/carsHook";
+import { seo } from "@/utils/seo";
 
 export type Car = {
 	name: string;
@@ -32,6 +33,32 @@ export const Route = createFileRoute("/_all/cars/$carSlug")({
 		if (!car) {
 			throw notFound();
 		}
+
+		return { car };
+	},
+	head: ({ loaderData }) => {
+		const car = loaderData?.car;
+		return {
+			meta: [
+				...seo({
+					title: car?.name
+						? `${car.name} Rental | Self Drive 4x4 Uganda`
+						: "Car Rental | Self Drive 4x4 Uganda",
+					description: car?.aboutCar
+						? `Rent ${car.name} in Uganda. ${car.aboutCar.substring(0, 150)}...`
+						: "Rent a quality 4x4 vehicle in Uganda. Competitive rates and professional service.",
+					keywords: [
+						car?.name || "",
+						"4x4 rental Uganda",
+						"car hire",
+						"self drive",
+						car?.category || "",
+					].filter(Boolean),
+					image: car?.images?.[0]?.url,
+					type: "product",
+				}),
+			],
+		};
 	},
 });
 
