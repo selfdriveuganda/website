@@ -76,7 +76,7 @@ function RouteComponent() {
 
 function DeferredComponent() {
 	return (
-		<div className="typography pt-20">
+		<div className="typography pt-16 sm:pt-18 md:pt-20">
 			{/* <SingleCarHero /> */}
 			<SingleCarHero2 />
 			<VehicleMainSpecs />

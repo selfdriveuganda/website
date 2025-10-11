@@ -56,11 +56,15 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 		}
 	};
 
+	if (!car) {
+		return null;
+	}
+
 	return (
-		<Card className="w-full max-w-md border-0 bg-white py-4 shadow-none">
-			<CardContent>
-				<div className="mb-6">
-					<h3 className="">{car?.name}</h3>
+		<Card className="h-full w-full border-0 bg-white py-4 shadow-none sm:max-w-md lg:rounded-xl lg:px-2">
+			<CardContent className="px-4 sm:px-6">
+				<div className="mb-4 sm:mb-6">
+					<h3 className="font-bold text-lg sm:text-xl">{car.name}</h3>
 					{/* <h2 className="mb-1 font-bold text-2xl">Book your car</h2> */}
 					<p className="text-gray-600 text-sm">
 						Please fill in the details to book your car
@@ -87,8 +91,8 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 								Choose where you'd like to pick up the car
 							</FieldDescription>
 						</Field>
-						<div className="grid grid-cols-3 gap-3">
-							<div className="col-span-2">
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+							<div className="sm:col-span-2">
 								<Field>
 									<FieldLabel>Pickup Date</FieldLabel>
 									<Popover>
@@ -134,10 +138,15 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 
 						{/* Submit Button */}
 						<div className="flex flex-col gap-2 pt-4">
-							<Button type="submit">
+							<Button className="w-full text-sm sm:text-base" type="submit">
 								Book Self Drive @ USD {car.price_per_day} /day
 							</Button>
-							<Button onClick={onClose} type="button" variant="outline">
+							<Button
+								className="w-full border-0 bg-accent/50 text-sm shadow-none sm:text-base"
+								onClick={onClose}
+								type="button"
+								variant="outline"
+							>
 								Book with Driver @ USD {car.price_per_day_with_driver} /day
 							</Button>
 						</div>

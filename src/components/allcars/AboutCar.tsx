@@ -1,3 +1,4 @@
+import { type PortableTextBlock, toPlainText } from "@portabletext/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { useState } from "react";
@@ -23,27 +24,30 @@ const AboutCar = () => {
 
 	const imageLength = car.images?.length;
 
-	// Handle both string and potential PortableText formats
-	const aboutText =
-		typeof car.about === "string"
+	// Handle PortableText conversion to plain text
+	const aboutText = car.about
+		? typeof car.about === "string"
 			? car.about
-			: car.aboutCar || "No description available for this car.";
+			: toPlainText(car.about as PortableTextBlock[])
+		: "No description available for this car.";
 
 	// Split text into lines for mobile truncation - ensure it's a string
 	const words = typeof aboutText === "string" ? aboutText.split(" ") : [];
 	const shouldTruncate = words.length > 50; // Approximate 4 lines worth of words
 
 	return (
-		<div className="container mx-auto px-4">
-			<h4 className="font-bold text-lg md:text-2xl">About {car.name}</h4>
+		<div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 md:px-8">
+			<h4 className="font-bold text-xl md:text-2xl lg:text-3xl">
+				About {car.name}
+			</h4>
 
 			{/* Desktop - full text always visible */}
-			<p className="mt-2 hidden text-sm leading-relaxed md:block">
+			<p className="mt-3 hidden text-sm leading-relaxed md:block md:text-base">
 				{aboutText}
 			</p>
 
 			{/* Mobile - expandable text */}
-			<div className="mt-2 md:hidden">
+			<div className="mt-3 md:hidden">
 				<p
 					className={`text-sm leading-relaxed ${!isExpanded && shouldTruncate ? "line-clamp-4" : ""}`}
 				>
@@ -61,12 +65,12 @@ const AboutCar = () => {
 				)}
 			</div>
 			{/* images  */}
-			<div className="my-8 grid grid-cols-1 gap-4 md:my-16 md:grid-cols-2 md:gap-8">
+			<div className="my-6 grid grid-cols-1 gap-4 sm:my-8 sm:gap-6 md:my-12 md:grid-cols-2 md:gap-8 lg:my-16">
 				{imageLength === 2 ? (
 					<div className="md:col-span-2">
 						<OptimizedImage
 							alt={car.images[1].alt || "Car image"}
-							className="h-[250px] w-full rounded-lg object-cover md:h-[450px]"
+							className="h-[250px] w-full rounded-lg object-cover sm:h-[350px] md:h-[450px]"
 							height={450}
 							source={car.images[1]}
 							width={800}
@@ -77,7 +81,7 @@ const AboutCar = () => {
 						<div key={`${img._key || img.asset?._id || index}`}>
 							<OptimizedImage
 								alt={img.alt || "Car image"}
-								className="h-[250px] w-full rounded-lg object-cover md:h-[450px]"
+								className="h-[250px] w-full rounded-lg object-cover sm:h-[350px] md:h-[450px]"
 								height={450}
 								source={img}
 								width={400}
