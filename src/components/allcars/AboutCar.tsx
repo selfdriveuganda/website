@@ -25,11 +25,14 @@ const AboutCar = () => {
 	const imageLength = car.images?.length;
 
 	// Handle PortableText conversion to plain text
-	const aboutText = car.about
-		? typeof car.about === "string"
-			? car.about
-			: toPlainText(car.about as PortableTextBlock[])
-		: "No description available for this car.";
+	let aboutText = "No description available for this car.";
+	if (car.about) {
+		if (typeof car.about === "string") {
+			aboutText = car.about;
+		} else {
+			aboutText = toPlainText(car.about as PortableTextBlock[]);
+		}
+	}
 
 	// Split text into lines for mobile truncation - ensure it's a string
 	const words = typeof aboutText === "string" ? aboutText.split(" ") : [];
