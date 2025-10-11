@@ -22,10 +22,15 @@ const AboutCar = () => {
 	}
 
 	const imageLength = car.images?.length;
-	const aboutText = car.about || "No description available for this car.";
 
-	// Split text into lines for mobile truncation
-	const words = aboutText.split(" ");
+	// Handle both string and potential PortableText formats
+	const aboutText =
+		typeof car.about === "string"
+			? car.about
+			: car.aboutCar || "No description available for this car.";
+
+	// Split text into lines for mobile truncation - ensure it's a string
+	const words = typeof aboutText === "string" ? aboutText.split(" ") : [];
 	const shouldTruncate = words.length > 50; // Approximate 4 lines worth of words
 
 	return (
