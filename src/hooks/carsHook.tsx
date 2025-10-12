@@ -227,8 +227,6 @@ export const fetchSingleCarQuery = (slug: string) =>
 	queryOptions({
 		queryKey: ["car", slug],
 		queryFn: async () => {
-			console.log("Fetching car with slug:", slug);
-
 			try {
 				return await client.fetch<SanityDocument | null>(SINGLE_CAR_QUERY, {
 					slug,

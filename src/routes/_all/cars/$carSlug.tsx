@@ -24,11 +24,8 @@ export const Route = createFileRoute("/_all/cars/$carSlug")({
 	component: RouteComponent,
 	loader: async ({ params, context: { queryClient } }) => {
 		const carSlug = params.carSlug;
-		console.log("carSlug in loader---------------->:", params);
 
 		const car = await queryClient.ensureQueryData(fetchSingleCarQuery(carSlug));
-
-		console.log("car in loader:", car);
 
 		if (!car) {
 			throw notFound();
@@ -63,8 +60,6 @@ export const Route = createFileRoute("/_all/cars/$carSlug")({
 });
 
 function RouteComponent() {
-	console.log("Rendering RouteComponent");
-
 	return (
 		<div>
 			<Suspense fallback={<LoadingComponent />}>

@@ -65,10 +65,6 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 			<CardContent className="px-4 sm:px-6">
 				<div className="mb-4 sm:mb-6">
 					<h3 className="font-bold text-lg sm:text-xl">{car.name}</h3>
-					{/* <h2 className="mb-1 font-bold text-2xl">Book your car</h2> */}
-					<p className="text-gray-600 text-sm">
-						Please fill in the details to book your car
-					</p>
 				</div>
 				<form onSubmit={handleSubmit}>
 					<FieldGroup>
@@ -117,22 +113,17 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 												disabled={(date) =>
 													date < new Date(new Date().setHours(0, 0, 0, 0))
 												}
-												initialFocus
 												mode="single"
 												onSelect={setPickupDate}
 												selected={pickupDate}
 											/>
 										</PopoverContent>
 									</Popover>
-									<FieldDescription>
-										Select your desired pickup date
-									</FieldDescription>
 								</Field>
 							</div>
 							<Field>
 								<FieldLabel htmlFor="time-picker">Time</FieldLabel>
 								<Input id="time-picker" required type="time" />
-								<FieldDescription>Time</FieldDescription>
 							</Field>
 						</div>
 

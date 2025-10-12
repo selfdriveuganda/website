@@ -5,7 +5,6 @@ import React from "react";
 import { fetchAllLocationsQuery } from "@/hooks/locationHook";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
-import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -104,19 +103,6 @@ export function PickupDate() {
 	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(undefined);
-	const [time, setTime] = React.useState("10:30:00");
-
-	const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newTime = e.target.value;
-		setTime(newTime);
-		navigate({
-			to: ".",
-			search: (old) => ({
-				...old,
-				pickupTime: newTime,
-			}),
-		});
-	};
 
 	return (
 		<div className="flex gap-2">
@@ -157,19 +143,6 @@ export function PickupDate() {
 					</PopoverContent>
 				</Popover>
 			</div>
-			<div className="flex flex-col gap-3">
-				<Label className="px-1 text-xs" htmlFor="pickup-time-picker">
-					Time
-				</Label>
-				<Input
-					className="w-24 appearance-none bg-background sm:w-20 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-					id="pickup-time-picker"
-					onChange={handleTimeChange}
-					step="1"
-					type="time"
-					value={time}
-				/>
-			</div>
 		</div>
 	);
 }
@@ -178,19 +151,6 @@ export function DropoffDate() {
 	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(undefined);
-	const [time, setTime] = React.useState("10:30:00");
-
-	const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newTime = e.target.value;
-		setTime(newTime);
-		navigate({
-			to: ".",
-			search: (old) => ({
-				...old,
-				dropoffTime: newTime,
-			}),
-		});
-	};
 
 	return (
 		<div className="flex gap-2">
@@ -230,19 +190,6 @@ export function DropoffDate() {
 						/>
 					</PopoverContent>
 				</Popover>
-			</div>
-			<div className="flex flex-col gap-3">
-				<Label className="px-1 text-xs" htmlFor="dropoff-time-picker">
-					Time
-				</Label>
-				<Input
-					className="w-24 appearance-none bg-background sm:w-20 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-					id="dropoff-time-picker"
-					onChange={handleTimeChange}
-					step="1"
-					type="time"
-					value={time}
-				/>
 			</div>
 		</div>
 	);
