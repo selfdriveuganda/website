@@ -2,6 +2,7 @@
 
 import type { SanityDocument } from "@sanity/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
@@ -37,22 +38,46 @@ type CarBookFormProps = {
 };
 
 export function CarBookForm({ onClose, car }: CarBookFormProps) {
+	const navigate = useNavigate();
 	const [pickupDate, setPickupDate] = useState<Date>();
+	const [returnDate, setReturnDate] = useState<Date>();
 	const [pickupLocation, setPickupLocation] = useState<string>("");
+	const [pickupTime, setPickupTime] = useState<string>("");
+	const [returnTime, setReturnTime] = useState<string>("");
 
 	const { data: locations } = useSuspenseQuery(fetchAllLocationsQuery);
 	const {
+		setCar,
 		setPickupLocation: savePickupLocation,
 		setPickupDate: savePickupDate,
+		setPickupTime: savePickupTime,
+		setReturnDate: saveReturnDate,
+		setReturnTime: saveReturnTime,
 	} = useBookingStore();
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleBooking = (withDriver: boolean) => (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (pickupLocation && pickupDate) {
+		if (
+			pickupLocation &&
+			pickupDate &&
+			pickupTime &&
+			returnDate &&
+			returnTime &&
+			car
+		) {
+			// Save booking details to store
+			setCar(car);
 			savePickupLocation(pickupLocation);
 			savePickupDate(pickupDate);
+			savePickupTime(pickupTime);
+			saveReturnDate(returnDate);
+			saveReturnTime(returnTime);
+
+			// Close modal
 			onClose?.();
+			// Navigate to booking page - route will be available after regeneration
+			navigate({ to: "/booking", search: { withDriver } });
 		}
 	};
 
@@ -66,7 +91,7 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 				<div className="mb-4 sm:mb-6">
 					<h3 className="font-bold text-lg sm:text-xl">{car.name}</h3>
 				</div>
-				<form onSubmit={handleSubmit}>
+				<form onSubmit={handleBooking(false)}>
 					<FieldGroup>
 						{/* Pickup Location */}
 						<Field>
@@ -87,6 +112,8 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 								Choose where you'd like to pick up the car
 							</FieldDescription>
 						</Field>
+
+						{/* Pickup Date & Time */}
 						<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 							<div className="sm:col-span-2">
 								<Field>
@@ -122,8 +149,63 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 								</Field>
 							</div>
 							<Field>
-								<FieldLabel htmlFor="time-picker">Time</FieldLabel>
-								<Input id="time-picker" required type="time" />
+								<FieldLabel htmlFor="pickup-time">Time</FieldLabel>
+								<Input
+									id="pickup-time"
+									onChange={(e) => setPickupTime(e.target.value)}
+									required
+									type="time"
+									value={pickupTime}
+								/>
+							</Field>
+						</div>
+
+						{/* Return Date & Time */}
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+							<div className="sm:col-span-2">
+								<Field>
+									<FieldLabel>Return Date</FieldLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button
+												className={cn(
+													"w-full justify-start text-left font-normal",
+													!returnDate && "text-muted-foreground"
+												)}
+												variant={"outline"}
+											>
+												<CalendarIcon className="mr-2 h-4 w-4" />
+												{returnDate ? (
+													format(returnDate, "PPP")
+												) : (
+													<span>Pick a date</span>
+												)}
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0">
+											<Calendar
+												disabled={(date) =>
+													date <
+													(pickupDate ||
+														new Date(new Date().setHours(0, 0, 0, 0)))
+												}
+												mode="single"
+												onSelect={setReturnDate}
+												selected={returnDate}
+											/>
+										</PopoverContent>
+									</Popover>
+								</Field>
+							</div>
+							<Field>
+								<FieldLabel htmlFor="return-time">Time</FieldLabel>
+								<Input
+									id="return-time"
+									onChange={(e) => setReturnTime(e.target.value)}
+									required
+									type="time"
+									value={returnTime}
+								/>
 							</Field>
 						</div>
 
@@ -134,7 +216,7 @@ export function CarBookForm({ onClose, car }: CarBookFormProps) {
 							</Button>
 							<Button
 								className="w-full border-0 bg-accent/50 text-sm shadow-none sm:text-base"
-								onClick={onClose}
+								onClick={handleBooking(true)}
 								type="button"
 								variant="outline"
 							>

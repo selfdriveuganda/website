@@ -16,12 +16,14 @@ import { Route as AllTermsAndConditionsRouteImport } from './routes/_all/terms-a
 import { Route as AllServicesRouteImport } from './routes/_all/services'
 import { Route as AllPrivacyPolicyRouteImport } from './routes/_all/privacy-policy'
 import { Route as AllContactRouteImport } from './routes/_all/contact'
+import { Route as AllBookingRouteImport } from './routes/_all/booking'
 import { Route as AllPackagesIndexRouteImport } from './routes/_all/packages/index'
 import { Route as AllDestinationsIndexRouteImport } from './routes/_all/destinations/index'
 import { Route as AllCarsIndexRouteImport } from './routes/_all/cars/index'
 import { Route as AllBlogsIndexRouteImport } from './routes/_all/blogs/index'
 import { Route as AllPackagesPackageSlugRouteImport } from './routes/_all/packages/$packageSlug'
 import { Route as AllCarsCarSlugRouteImport } from './routes/_all/cars/$carSlug'
+import { Route as AllBookingCallbackRouteImport } from './routes/_all/booking/callback'
 import { Route as AllBlogsBlogSlugRouteImport } from './routes/_all/blogs/$blogSlug'
 import { Route as AllDestinationsDestinationSlugIndexRouteImport } from './routes/_all/destinations/$destinationSlug/index'
 
@@ -59,6 +61,11 @@ const AllContactRoute = AllContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => AllRoute,
 } as any)
+const AllBookingRoute = AllBookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => AllRoute,
+} as any)
 const AllPackagesIndexRoute = AllPackagesIndexRouteImport.update({
   id: '/packages/',
   path: '/packages/',
@@ -89,6 +96,11 @@ const AllCarsCarSlugRoute = AllCarsCarSlugRouteImport.update({
   path: '/cars/$carSlug',
   getParentRoute: () => AllRoute,
 } as any)
+const AllBookingCallbackRoute = AllBookingCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AllBookingRoute,
+} as any)
 const AllBlogsBlogSlugRoute = AllBlogsBlogSlugRouteImport.update({
   id: '/blogs/$blogSlug',
   path: '/blogs/$blogSlug',
@@ -103,12 +115,14 @@ const AllDestinationsDestinationSlugIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/maintenance': typeof MaintenanceRoute
+  '/booking': typeof AllBookingRouteWithChildren
   '/contact': typeof AllContactRoute
   '/privacy-policy': typeof AllPrivacyPolicyRoute
   '/services': typeof AllServicesRoute
   '/terms-and-conditions': typeof AllTermsAndConditionsRoute
   '/': typeof AllIndexRoute
   '/blogs/$blogSlug': typeof AllBlogsBlogSlugRoute
+  '/booking/callback': typeof AllBookingCallbackRoute
   '/cars/$carSlug': typeof AllCarsCarSlugRoute
   '/packages/$packageSlug': typeof AllPackagesPackageSlugRoute
   '/blogs': typeof AllBlogsIndexRoute
@@ -119,12 +133,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/maintenance': typeof MaintenanceRoute
+  '/booking': typeof AllBookingRouteWithChildren
   '/contact': typeof AllContactRoute
   '/privacy-policy': typeof AllPrivacyPolicyRoute
   '/services': typeof AllServicesRoute
   '/terms-and-conditions': typeof AllTermsAndConditionsRoute
   '/': typeof AllIndexRoute
   '/blogs/$blogSlug': typeof AllBlogsBlogSlugRoute
+  '/booking/callback': typeof AllBookingCallbackRoute
   '/cars/$carSlug': typeof AllCarsCarSlugRoute
   '/packages/$packageSlug': typeof AllPackagesPackageSlugRoute
   '/blogs': typeof AllBlogsIndexRoute
@@ -137,12 +153,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_all': typeof AllRouteWithChildren
   '/maintenance': typeof MaintenanceRoute
+  '/_all/booking': typeof AllBookingRouteWithChildren
   '/_all/contact': typeof AllContactRoute
   '/_all/privacy-policy': typeof AllPrivacyPolicyRoute
   '/_all/services': typeof AllServicesRoute
   '/_all/terms-and-conditions': typeof AllTermsAndConditionsRoute
   '/_all/': typeof AllIndexRoute
   '/_all/blogs/$blogSlug': typeof AllBlogsBlogSlugRoute
+  '/_all/booking/callback': typeof AllBookingCallbackRoute
   '/_all/cars/$carSlug': typeof AllCarsCarSlugRoute
   '/_all/packages/$packageSlug': typeof AllPackagesPackageSlugRoute
   '/_all/blogs/': typeof AllBlogsIndexRoute
@@ -155,12 +173,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/maintenance'
+    | '/booking'
     | '/contact'
     | '/privacy-policy'
     | '/services'
     | '/terms-and-conditions'
     | '/'
     | '/blogs/$blogSlug'
+    | '/booking/callback'
     | '/cars/$carSlug'
     | '/packages/$packageSlug'
     | '/blogs'
@@ -171,12 +191,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/maintenance'
+    | '/booking'
     | '/contact'
     | '/privacy-policy'
     | '/services'
     | '/terms-and-conditions'
     | '/'
     | '/blogs/$blogSlug'
+    | '/booking/callback'
     | '/cars/$carSlug'
     | '/packages/$packageSlug'
     | '/blogs'
@@ -188,12 +210,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_all'
     | '/maintenance'
+    | '/_all/booking'
     | '/_all/contact'
     | '/_all/privacy-policy'
     | '/_all/services'
     | '/_all/terms-and-conditions'
     | '/_all/'
     | '/_all/blogs/$blogSlug'
+    | '/_all/booking/callback'
     | '/_all/cars/$carSlug'
     | '/_all/packages/$packageSlug'
     | '/_all/blogs/'
@@ -259,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AllContactRouteImport
       parentRoute: typeof AllRoute
     }
+    '/_all/booking': {
+      id: '/_all/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof AllBookingRouteImport
+      parentRoute: typeof AllRoute
+    }
     '/_all/packages/': {
       id: '/_all/packages/'
       path: '/packages'
@@ -301,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AllCarsCarSlugRouteImport
       parentRoute: typeof AllRoute
     }
+    '/_all/booking/callback': {
+      id: '/_all/booking/callback'
+      path: '/callback'
+      fullPath: '/booking/callback'
+      preLoaderRoute: typeof AllBookingCallbackRouteImport
+      parentRoute: typeof AllBookingRoute
+    }
     '/_all/blogs/$blogSlug': {
       id: '/_all/blogs/$blogSlug'
       path: '/blogs/$blogSlug'
@@ -318,7 +356,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AllBookingRouteChildren {
+  AllBookingCallbackRoute: typeof AllBookingCallbackRoute
+}
+
+const AllBookingRouteChildren: AllBookingRouteChildren = {
+  AllBookingCallbackRoute: AllBookingCallbackRoute,
+}
+
+const AllBookingRouteWithChildren = AllBookingRoute._addFileChildren(
+  AllBookingRouteChildren,
+)
+
 interface AllRouteChildren {
+  AllBookingRoute: typeof AllBookingRouteWithChildren
   AllContactRoute: typeof AllContactRoute
   AllPrivacyPolicyRoute: typeof AllPrivacyPolicyRoute
   AllServicesRoute: typeof AllServicesRoute
@@ -335,6 +386,7 @@ interface AllRouteChildren {
 }
 
 const AllRouteChildren: AllRouteChildren = {
+  AllBookingRoute: AllBookingRouteWithChildren,
   AllContactRoute: AllContactRoute,
   AllPrivacyPolicyRoute: AllPrivacyPolicyRoute,
   AllServicesRoute: AllServicesRoute,
