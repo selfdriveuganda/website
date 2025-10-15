@@ -18,6 +18,21 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	],
+	define: {
+		// Make environment variables available at build time
+		"process.env.PESAPAL_BASE_URL": JSON.stringify(
+			process.env.PESAPAL_BASE_URL || "https://cybqa.pesapal.com/pesapalv3"
+		),
+		"process.env.PESAPAL_CONSUMER_KEY": JSON.stringify(
+			process.env.PESAPAL_CONSUMER_KEY || ""
+		),
+		"process.env.PESAPAL_CONSUMER_SECRET": JSON.stringify(
+			process.env.PESAPAL_CONSUMER_SECRET || ""
+		),
+		"process.env.PESAPAL_IPN_ID": JSON.stringify(
+			process.env.PESAPAL_IPN_ID || ""
+		),
+	},
 	server: {
 		proxy: {
 			"/api/pesapal": {

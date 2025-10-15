@@ -1,45 +1,17 @@
 // biome-ignore-all lint/style/useNamingConvention: Pesapal API uses snake_case
-/**
- * Pesapal Payment Integration - Server Functions
- * Documentation: https://documenter.getpostman.com/view/6715320/UyxepTv1
- *
- * Note: Pesapal API uses snake_case for property names.
- * These types match the external API exactly.
- *
- * Using TanStack Start server functions to handle Pesapal API calls server-side
- * This avoids CORS issues and keeps credentials secure
- */
 
 import { createServerFn } from "@tanstack/react-start";
 
-// Helper to get environment variables (works in both server and client contexts)
-const getEnvVar = (key: string): string | undefined => {
-	// Server-side: try multiple sources
-	if (typeof process !== "undefined") {
-		// Try without VITE_ prefix first (for Cloudflare Workers .dev.vars)
-		const directValue = process.env?.[key];
-		if (directValue) {
-			return directValue;
-		}
-
-		// Try with VITE_ prefix (for standard .env files)
-		const viteValue = process.env?.[`VITE_${key}`];
-		if (viteValue) {
-			return viteValue;
-		}
-	}
-
-	// Client-side: use import.meta.env with VITE_ prefix
-	if (typeof import.meta !== "undefined" && import.meta.env) {
-		return import.meta.env[`VITE_${key}`] as string | undefined;
-	}
-};
-
+// Access environment variables
+// In Cloudflare Workers/Pages, these come from wrangler.jsonc (dev) or Dashboard (production)
+// During build, Vite will inline these values
 const PESAPAL_BASE_URL =
-	getEnvVar("PESAPAL_BASE_URL") || "https://cybqa.pesapal.com/pesapalv3";
+	process.env.PESAPAL_BASE_URL || "https://cybqa.pesapal.com/pesapalv3";
+const CONSUMER_KEY = process.env.PESAPAL_CONSUMER_KEY;
+const CONSUMER_SECRET = process.env.PESAPAL_CONSUMER_SECRET;
 
-const CONSUMER_KEY = getEnvVar("PESAPAL_CONSUMER_KEY");
-const CONSUMER_SECRET = getEnvVar("PESAPAL_CONSUMER_SECRET");
+// Export IPN_ID for use in other modules if needed
+export const PESAPAL_IPN_ID = process.env.PESAPAL_IPN_ID;
 
 export type PesapalEnvironment = "sandbox" | "live";
 
@@ -115,95 +87,103 @@ export type PesapalTransactionStatus = {
  * Get Pesapal OAuth token
  * Server function - runs on server to avoid CORS and protect credentials
  */
-export async function getPesapalToken(): Promise<string> {
-	"use server";
+export const getPesapalToken = createServerFn({ method: "POST" })
+	.inputValidator(() => ({})) // No input needed
+	.handler(async () => {
+		// Validate credentials exist
+		if (!(CONSUMER_KEY && CONSUMER_SECRET)) {
+			throw new Error(
+				"Pesapal credentials not configured. Please check environment variables."
+			);
+		}
 
-	// Validate credentials exist
-	if (!(CONSUMER_KEY && CONSUMER_SECRET)) {
-		throw new Error(
-			"Pesapal credentials not configured. Please check environment variables."
+		// Trim credentials to remove any whitespace
+		const consumerKey = CONSUMER_KEY?.trim();
+		const consumerSecret = CONSUMER_SECRET?.trim();
+
+		console.log("Requesting Pesapal token from:", PESAPAL_BASE_URL);
+		console.log("Consumer Key length:", consumerKey?.length);
+		console.log(
+			"Consumer Key (first 10 chars):",
+			consumerKey?.substring(0, 10)
 		);
-	}
+		console.log("Consumer Secret length:", consumerSecret?.length);
 
-	// Trim credentials to remove any whitespace
-	const consumerKey = CONSUMER_KEY?.trim();
-	const consumerSecret = CONSUMER_SECRET?.trim();
+		const requestBody = {
+			consumer_key: consumerKey,
+			consumer_secret: consumerSecret,
+		};
 
-	console.log("Requesting Pesapal token from:", PESAPAL_BASE_URL);
-	console.log("Consumer Key length:", consumerKey?.length);
-	console.log("Consumer Key (first 10 chars):", consumerKey?.substring(0, 10));
-	console.log("Consumer Secret length:", consumerSecret?.length);
+		console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-	const requestBody = {
-		consumer_key: consumerKey,
-		consumer_secret: consumerSecret,
-	};
-
-	console.log("Request body:", JSON.stringify(requestBody, null, 2));
-
-	// Note: In development with Cloudflare Workers runtime, we may need to handle SSL differently
-	// The workerd runtime may have issues with some SSL certificates
-	try {
-		const response = await fetch(`${PESAPAL_BASE_URL}/api/Auth/RequestToken`, {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(requestBody),
-		});
-
-		if (!response.ok) {
-			const errorText = await response.text().catch(() => response.statusText);
-			console.error("Pesapal token request failed:", {
-				status: response.status,
-				statusText: response.statusText,
-				error: errorText,
-			});
-			throw new Error(
-				`Failed to get Pesapal token: ${response.status} ${response.statusText} - ${errorText}`
+		// Note: In development with Cloudflare Workers runtime, we may need to handle SSL differently
+		// The workerd runtime may have issues with some SSL certificates
+		try {
+			const response = await fetch(
+				`${PESAPAL_BASE_URL}/api/Auth/RequestToken`,
+				{
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(requestBody),
+				}
 			);
-		}
 
-		const data: PesapalAuthResponse = await response.json();
-		console.log("Pesapal token response:", {
-			hasToken: !!data.token,
-			status: data.status,
-			message: data.message,
-			error: data.error,
-			fullResponse: data,
-		});
+			if (!response.ok) {
+				const errorText = await response
+					.text()
+					.catch(() => response.statusText);
+				console.error("Pesapal token request failed:", {
+					status: response.status,
+					statusText: response.statusText,
+					error: errorText,
+				});
+				throw new Error(
+					`Failed to get Pesapal token: ${response.status} ${response.statusText} - ${errorText}`
+				);
+			}
 
-		if (data.error || !data.token) {
-			const errorMsg =
-				data.error || data.message || "Failed to get Pesapal token";
-			console.error("Pesapal token error details:", {
-				error: data.error,
-				message: data.message,
+			const data: PesapalAuthResponse = await response.json();
+			console.log("Pesapal token response:", {
+				hasToken: !!data.token,
 				status: data.status,
+				message: data.message,
+				error: data.error,
+				fullResponse: data,
 			});
-			throw new Error(`Pesapal API Error: ${errorMsg}`);
-		}
 
-		return data.token;
-	} catch (error) {
-		// Check if it's an SSL certificate error
-		if (
-			error instanceof Error &&
-			(error.message.includes("certificate") ||
-				error.message.includes("TLS") ||
-				error.message.includes("SSL"))
-		) {
-			throw new Error(
-				"SSL Certificate Error: Unable to connect to Pesapal API. " +
-					"This is a known issue with Cloudflare Workers in development. " +
-					"The application will work correctly in production. " +
-					"For local testing, consider using the 4by4-final workspace which uses a different runtime."
-			);
+			if (data.error || !data.token) {
+				const errorMsg =
+					data.error || data.message || "Failed to get Pesapal token";
+				console.error("Pesapal token error details:", {
+					error: data.error,
+					message: data.message,
+					status: data.status,
+				});
+				throw new Error(`Pesapal API Error: ${errorMsg}`);
+			}
+
+			return data.token;
+		} catch (error) {
+			// Check if it's an SSL certificate error
+			if (
+				error instanceof Error &&
+				(error.message.includes("certificate") ||
+					error.message.includes("TLS") ||
+					error.message.includes("SSL"))
+			) {
+				throw new Error(
+					"SSL Certificate Error: Unable to connect to Pesapal API. " +
+						"This is a known issue with Cloudflare Workers in development. " +
+						"The application will work correctly in production. " +
+						"For local testing, consider using the 4by4-final workspace which uses a different runtime."
+				);
+			}
+			throw error;
 		}
-		throw error;
-	}
-}
+	});
 
 /**
  * Register IPN (Instant Payment Notification) URL
@@ -214,9 +194,7 @@ export const registerIPN = createServerFn({ method: "POST" })
 		(data: { url: string; ipn_notification_type: "GET" | "POST" }) => data
 	)
 	.handler(async ({ data }) => {
-		"use server";
-
-		const token = await getPesapalToken();
+		const token = await getPesapalToken({ data: {} });
 
 		const response = await fetch(
 			`${PESAPAL_BASE_URL}/api/URLSetup/RegisterIPN`,
@@ -251,25 +229,28 @@ export const registerIPN = createServerFn({ method: "POST" })
  * Get list of registered IPNs
  * Server function - runs on server to avoid CORS
  */
-export async function getRegisteredIPNs(): Promise<PesapalIPN[]> {
-	"use server";
+export const getRegisteredIPNs = createServerFn({ method: "GET" })
+	.inputValidator(() => ({})) // No input needed
+	.handler(async () => {
+		const token = await getPesapalToken({ data: {} });
 
-	const token = await getPesapalToken();
+		const response = await fetch(
+			`${PESAPAL_BASE_URL}/api/URLSetup/GetIpnList`,
+			{
+				method: "GET",
+				headers: {
+					Accept: "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
 
-	const response = await fetch(`${PESAPAL_BASE_URL}/api/URLSetup/GetIpnList`, {
-		method: "GET",
-		headers: {
-			Accept: "application/json",
-			Authorization: `Bearer ${token}`,
-		},
+		if (!response.ok) {
+			throw new Error(`Failed to get IPNs: ${response.statusText}`);
+		}
+
+		return await response.json();
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to get IPNs: ${response.statusText}`);
-	}
-
-	return await response.json();
-}
 
 /**
  * Submit an order request to Pesapal
@@ -278,9 +259,7 @@ export async function getRegisteredIPNs(): Promise<PesapalIPN[]> {
 export const submitOrder = createServerFn({ method: "POST" })
 	.inputValidator((data: PesapalOrderRequest) => data)
 	.handler(async ({ data }) => {
-		"use server";
-
-		const token = await getPesapalToken();
+		const token = await getPesapalToken({ data: {} });
 
 		// Validate required fields
 		if (!data.notification_id) {
@@ -338,9 +317,7 @@ export const submitOrder = createServerFn({ method: "POST" })
 export const getTransactionStatus = createServerFn({ method: "GET" })
 	.inputValidator((orderTrackingId: string) => orderTrackingId)
 	.handler(async ({ data: orderTrackingId }) => {
-		"use server";
-
-		const token = await getPesapalToken();
+		const token = await getPesapalToken({ data: {} });
 
 		const response = await fetch(
 			`${PESAPAL_BASE_URL}/api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`,
