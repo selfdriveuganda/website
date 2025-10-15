@@ -14,12 +14,25 @@ import { createServerFn } from "@tanstack/react-start";
 
 // Helper to get environment variables (works in both server and client contexts)
 const getEnvVar = (key: string): string | undefined => {
-	// Server-side: try both with and without VITE_ prefix
+	// Server-side: try multiple sources
 	if (typeof process !== "undefined") {
-		return process.env?.[key] || process.env?.[`VITE_${key}`];
+		// Try without VITE_ prefix first (for Cloudflare Workers .dev.vars)
+		const directValue = process.env?.[key];
+		if (directValue) {
+			return directValue;
+		}
+
+		// Try with VITE_ prefix (for standard .env files)
+		const viteValue = process.env?.[`VITE_${key}`];
+		if (viteValue) {
+			return viteValue;
+		}
 	}
+
 	// Client-side: use import.meta.env with VITE_ prefix
-	return import.meta.env[`VITE_${key}`] as string | undefined;
+	if (typeof import.meta !== "undefined" && import.meta.env) {
+		return import.meta.env[`VITE_${key}`] as string | undefined;
+	}
 };
 
 const PESAPAL_BASE_URL =

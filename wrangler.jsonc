@@ -1,7 +1,26 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "4by4finalweb",
-  "compatibility_date": "2025-09-02",
+  "name": "selfdrive4x4uganda",
+  "main": "@tanstack/react-start/server-entry",
+  "compatibility_date": "2025-10-15",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+
+  "env": {
+    "development": {
+      "vars": {
+        "PESAPAL_BASE_URL": "https://cybqa.pesapal.com/pesapalv3",
+        "PESAPAL_CONSUMER_KEY": "TDpigBOOhs+zAl8cwH2Fl82jJGyD8xev",
+        "PESAPAL_CONSUMER_SECRET": "1KpqkfsMaihIcOlhnBo/gBZ5smw=",
+        "PESAPAL_IPN_ID": "ed7c8922-59fb-4361-ba83-db933d7a325c"
+      }
+    },
+    "production": {
+      "vars": {
+        "PESAPAL_BASE_URL": "https://pay.pesapal.com/v3",
+        "PESAPAL_CONSUMER_KEY": "YOUR_PRODUCTION_CONSUMER_KEY",
+        "PESAPAL_CONSUMER_SECRET": "YOUR_PRODUCTION_CONSUMER_SECRET",
+        "PESAPAL_IPN_ID": "YOUR_PRODUCTION_IPN_ID"
+      }
+    }
+  }
 }
