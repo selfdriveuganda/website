@@ -1,0 +1,6 @@
+# Ignore macOS Finder resource forks and metadata files
+**/._*
+**/.DS_Store
+**/.AppleDouble/**
+**/.Spotlight-V100/**
+**/.Trashes/**

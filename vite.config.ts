@@ -21,7 +21,7 @@ const config = defineConfig({
 	define: {
 		// Make environment variables available at build time
 		"process.env.PESAPAL_BASE_URL": JSON.stringify(
-			process.env.PESAPAL_BASE_URL || "https://cybqa.pesapal.com/pesapalv3"
+			process.env.PESAPAL_BASE_URL || "https://cybqa.pesapal.com/pesapalv3/api"
 		),
 		"process.env.PESAPAL_CONSUMER_KEY": JSON.stringify(
 			process.env.PESAPAL_CONSUMER_KEY || ""

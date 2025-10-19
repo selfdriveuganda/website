@@ -20,7 +20,6 @@ import {
 import {
 	calculateBookingAmount,
 	generateMerchantReference,
-	type PesapalOrderRequest,
 	submitOrder,
 } from "@/lib/pesapal";
 import { useBookingStore } from "@/stores/bookingStore";
@@ -103,6 +102,7 @@ function RouteComponent() {
 			const merchantReference = generateMerchantReference();
 
 			// Prepare order data for Pesapal
+			// Note: notification_id (IPN ID) is added by the server function
 			const orderData = {
 				id: merchantReference,
 				currency: "USD",
@@ -110,8 +110,6 @@ function RouteComponent() {
 				description: `Car Rental: ${car.name} (${withDriver ? "with driver" : "self-drive"})`,
 				// biome-ignore lint/style/useNamingConvention: Pesapal API requires snake_case
 				callback_url: `${window.location.origin}/booking/callback`,
-				// biome-ignore lint/style/useNamingConvention: Pesapal API requires snake_case
-				notification_id: import.meta.env.VITE_PESAPAL_IPN_ID || "",
 				// biome-ignore lint/style/useNamingConvention: Pesapal API requires snake_case
 				billing_address: {
 					// biome-ignore lint/style/useNamingConvention: Pesapal API requires snake_case

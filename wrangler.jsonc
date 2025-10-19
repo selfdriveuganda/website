@@ -8,7 +8,7 @@
   "env": {
     "development": {
       "vars": {
-        "PESAPAL_BASE_URL": "https://cybqa.pesapal.com/pesapalv3",
+        "PESAPAL_BASE_URL": "https://cybqa.pesapal.com/pesapalv3/api",
         "PESAPAL_CONSUMER_KEY": "TDpigBOOhs+zAl8cwH2Fl82jJGyD8xev",
         "PESAPAL_CONSUMER_SECRET": "1KpqkfsMaihIcOlhnBo/gBZ5smw=",
         "PESAPAL_IPN_ID": "ed7c8922-59fb-4361-ba83-db933d7a325c"
@@ -16,7 +16,7 @@
     },
     "production": {
       "vars": {
-        "PESAPAL_BASE_URL": "https://pay.pesapal.com/v3",
+        "PESAPAL_BASE_URL": "https://pay.pesapal.com/v3/api",
         "PESAPAL_CONSUMER_KEY": "YOUR_PRODUCTION_CONSUMER_KEY",
         "PESAPAL_CONSUMER_SECRET": "YOUR_PRODUCTION_CONSUMER_SECRET",
         "PESAPAL_IPN_ID": "YOUR_PRODUCTION_IPN_ID"

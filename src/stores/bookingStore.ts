@@ -2,7 +2,7 @@ import type { SanityDocument } from "@sanity/client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface BookingState {
+type BookingState = {
 	car: SanityDocument | null;
 	carSetAt: number | null; // timestamp when car was set
 	selectedProtectionPlan: string | null; // selected protection plan name or 'none'
@@ -20,9 +20,9 @@ interface BookingState {
 		currency: string;
 	};
 	bookingData?: any; // Store the complete booking form data
-}
+};
 
-interface BookingActions {
+type BookingActions = {
 	setCar: (car: SanityDocument | null) => void;
 	getCar: () => SanityDocument | null; // getter that checks expiration
 	clearExpiredCar: () => void;
@@ -43,7 +43,7 @@ interface BookingActions {
 		currency: string;
 	}) => void;
 	setBookingData: (bookingData: any) => void;
-}
+};
 
 const initialState: BookingState = {
 	car: null,
@@ -136,6 +136,32 @@ export const useBookingStore = create<BookingState & BookingActions>()(
 					bookingData,
 				})),
 		}),
-		{ name: "bookingStore" }
+		{
+			name: "bookingStore",
+			// Custom storage to handle Date serialization
+			storage: {
+				getItem: (name) => {
+					const str = localStorage.getItem(name);
+					if (!str) {
+						return null;
+					}
+					const { state } = JSON.parse(str);
+					// Convert string dates back to Date objects
+					if (state.pickup_date) {
+						state.pickup_date = new Date(state.pickup_date);
+					}
+					if (state.return_date) {
+						state.return_date = new Date(state.return_date);
+					}
+					return { state };
+				},
+				setItem: (name, value) => {
+					localStorage.setItem(name, JSON.stringify(value));
+				},
+				removeItem: (name) => {
+					localStorage.removeItem(name);
+				},
+			},
+		}
 	)
 );
