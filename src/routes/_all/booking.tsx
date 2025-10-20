@@ -19,10 +19,9 @@ import {
 } from "@/components/ui/select";
 import {
 	calculateBookingAmount,
-	generateMerchantReference,
-	submitOrder,
 } from "@/lib/pesapal";
 import { useBookingStore } from "@/stores/bookingStore";
+import { createPayment } from "@/lib/pesapal_client";
 
 const bookingSearchSchema = z.object({
 	carId: z.string().optional(),
@@ -98,13 +97,9 @@ function RouteComponent() {
 				throw new Error("Missing return date");
 			}
 
-			// Generate unique merchant reference
-			const merchantReference = generateMerchantReference();
-
 			// Prepare order data for Pesapal
-			// Note: notification_id (IPN ID) is added by the server function
 			const orderData = {
-				id: merchantReference,
+				id: `ORDER_${Date.now()}`,
 				currency: "USD",
 				amount: totalAmount,
 				description: `Car Rental: ${car.name} (${withDriver ? "with driver" : "self-drive"})`,
@@ -126,13 +121,17 @@ function RouteComponent() {
 				},
 			};
 
-			// Submit order to Pesapal
-			const response = await submitOrder({ data: orderData });
+			// Submit order to Pesapal via server function
+			const response = await createPayment({ data: orderData });
+			
+			if (!response.success) {
+				throw new Error(response.error || "Payment creation failed");
+			}
 
 			// Store payment info in booking store
 			useBookingStore.getState().setPaymentInfo({
-				orderTrackingId: response.order_tracking_id,
-				merchantReference: response.merchant_reference,
+				orderTrackingId: response.data.order_tracking_id,
+				merchantReference: response.data.merchant_reference,
 				amount: totalAmount,
 				currency: "USD",
 			});
@@ -144,11 +143,16 @@ function RouteComponent() {
 			});
 
 			// Redirect to Pesapal payment page
-			window.location.href = response.redirect_url;
+			if (response.data.redirect_url) {
+				window.location.href = response.data.redirect_url;
+			} else {
+				throw new Error("No redirect URL received from payment gateway");
+			}
 		} catch (err) {
-			setError(
-				err instanceof Error ? err.message : "Failed to process payment"
-			);
+			const errorMessage = err instanceof Error ? err.message : "Failed to process payment";
+			setError(errorMessage);
+			setIsSubmitting(false);
+		} finally {
 			setIsSubmitting(false);
 		}
 	};
